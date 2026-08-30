@@ -1,4 +1,4 @@
-name: 公式NEWS記事取得テスト
+name: 公式NEWS記事データ検証
 
 on:
   workflow_dispatch:
@@ -11,74 +11,113 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 公式NEWSを取得
+      - name: Python準備
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: 必要ライブラリ準備
+        run: |
+          python -m pip install beautifulsoup4
+
+      - name: 公式NEWSを検証
         run: |
           python - <<'PY'
+          import re
           import urllib.request
-          from html.parser import HTMLParser
+          from bs4 import BeautifulSoup
           from urllib.parse import urljoin
 
-          url = "https://www.news.cho-kaguyahime.com/"
+          BASE = "https://www.news.cho-kaguyahime.com/"
+          DATE_RE = re.compile(
+              r"(\d{1,2})月\s*(\d{1,2}),\s*(\d{4})"
+          )
 
-          class Parser(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.links = []
-                  self.current = None
-
-              def handle_starttag(self, tag, attrs):
-                  if tag == "a":
-                      attrs = dict(attrs)
-                      href = attrs.get("href")
-                      if href:
-                          self.current = [urljoin(url, href), ""]
-
-              def handle_data(self, data):
-                  if self.current:
-                      self.current[1] += data
-
-              def handle_endtag(self, tag):
-                  if tag == "a" and self.current:
-                      title = " ".join(self.current[1].split())
-                      link = self.current[0]
-
-                      if title and link.startswith(
-                          "https://www.news.cho-kaguyahime.com/"
-                      ):
-                          self.links.append((title, link))
-
-                      self.current = None
-
-          request = urllib.request.Request(
-              url,
+          req = urllib.request.Request(
+              BASE,
               headers={"User-Agent": "Mozilla/5.0"}
           )
 
-          with urllib.request.urlopen(request, timeout=30) as response:
+          with urllib.request.urlopen(req, timeout=30) as response:
               html = response.read().decode(
                   "utf-8",
                   errors="replace"
               )
 
+          soup = BeautifulSoup(html, "html.parser")
+
           print("公式NEWS取得: OK")
           print("HTMLサイズ:", len(html), "bytes")
-
-          parser = Parser()
-          parser.feed(html)
-
-          print("検出リンク数:", len(parser.links))
           print("")
-          print("検出した記事候補:")
 
-          for title, link in parser.links[:20]:
+          results = []
+          seen = set()
+
+          for h2 in soup.find_all("h2"):
+              a = h2.find("a", href=True)
+
+              if not a:
+                  continue
+
+              title = " ".join(a.get_text(" ", strip=True).split())
+              url = urljoin(BASE, a["href"])
+
+              if not title:
+                  continue
+
+              if not url.startswith(BASE):
+                  continue
+
+              if url.rstrip("/") == BASE.rstrip("/"):
+                  continue
+
+              if url in seen:
+                  continue
+
+              # h2の近くから公開日を探す
+              date_text = None
+              node = h2
+
+              for _ in range(5):
+                  if node is None:
+                      break
+
+                  text = " ".join(
+                      node.get_text(" ", strip=True).split()
+                  )
+
+                  match = DATE_RE.search(text)
+
+                  if match:
+                      date_text = match.group(0)
+                      break
+
+                  node = node.parent
+
+              if date_text:
+                  seen.add(url)
+                  results.append(
+                      (title, url, date_text)
+                  )
+
+          print("検出した記事データ:", len(results), "件")
+          print("")
+
+          for i, (title, url, date) in enumerate(
+              results[:20], 1
+          ):
+              print(f"【{i}】")
               print("タイトル:", title)
-              print("URL:", link)
+              print("URL:", url)
+              print("公開日:", date)
               print("---")
 
-          if not parser.links:
+          if not results:
               raise SystemExit(
-                  "記事候補を検出できませんでした"
+                  "タイトル・URL・公開日のセットを"
+                  "1件も検出できませんでした"
               )
 
-          print("診断結果: SUCCESS")
+          print("")
+          print("検証結果: SUCCESS")
           PY
