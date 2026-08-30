@@ -1,0 +1,95 @@
+name: 公式NEWS構造診断
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリ取得
+        uses: actions/checkout@v4
+
+      - name: Python準備
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: 公式NEWSの構造を診断
+        run: |
+          python - <<'PY'
+          import urllib.request
+          from html.parser import HTMLParser
+          from urllib.parse import urljoin
+
+          URL = "https://www.news.cho-kaguyahime.com/"
+
+          class Parser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.links = []
+                  self.current = None
+
+              def handle_starttag(self, tag, attrs):
+                  if tag == "a":
+                      attrs = dict(attrs)
+                      href = attrs.get("href", "")
+                      if href:
+                          self.current = [urljoin(URL, href), ""]
+
+              def handle_data(self, data):
+                  if self.current:
+                      self.current[1] += data
+
+              def handle_endtag(self, tag):
+                  if tag == "a" and self.current:
+                      url, text = self.current
+                      text = " ".join(text.split())
+
+                      if text:
+                          self.links.append((text, url))
+
+                      self.current = None
+
+          request = urllib.request.Request(
+              URL,
+              headers={"User-Agent": "Mozilla/5.0"}
+          )
+
+          with urllib.request.urlopen(request, timeout=30) as response:
+              html = response.read().decode("utf-8", errors="replace")
+
+          print("HTML取得: OK")
+          print("HTMLサイズ:", len(html), "bytes")
+
+          parser = Parser()
+          parser.feed(html)
+
+          print("リンク総数:", len(parser.links))
+          print("")
+          print("記事候補:")
+
+          count = 0
+
+          for text, url in parser.links:
+              if "cho-kaguyahime.com" in url:
+                  print("-", text[:100])
+                  print("  ", url)
+                  count += 1
+
+              if count >= 20:
+                  break
+
+          if count == 0:
+              raise SystemExit(
+                  "記事候補を検出できませんでした"
+              )
+
+          print("")
+          print("診断結果: SUCCESS")
+          print("記事候補数:", count)
+          PY
