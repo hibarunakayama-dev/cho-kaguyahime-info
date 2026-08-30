@@ -2,9 +2,8 @@ name: 超かぐや姫！情報自動収集
 
 on:
   workflow_dispatch:
-
   schedule:
-    - cron: "17 5 * * *"
+    - cron: "0 0 * * *"
 
 permissions:
   contents: write
@@ -21,6 +20,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+
+      - name: 必要ライブラリ準備
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install beautifulsoup4
 
       - name: 情報を収集
         run: |
@@ -47,9 +51,11 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         run: |
           git add data.json
-          git commit -m "Update information data"
+          git commit -m "Update official NEWS data"
           git push
 
       - name: 完了
         run: |
-          echo "超かぐや姫！情報自動収集が完了しました"
+          echo "================================"
+          echo "超かぐや姫！情報自動収集 完了"
+          echo "================================"
