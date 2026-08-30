@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>超かぐや姫！情報センター</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Noto Sans JP",
+    "Yu Gothic",
+    sans-serif;
+  background: #f5f3fa;
+  color: #28243a;
+}
+
+header {
+  background: linear-gradient(135deg, #493889, #7664c5);
+  color: white;
+  padding: 30px 20px;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+}
+
+h1 {
+  margin: 5px 0 10px;
+  font-size: 32px;
+}
+
+.subtitle {
+  margin: 0;
+  opacity: 0.9;
+}
+
+main {
+  max-width: 1100px;
+  margin: auto;
+  padding: 25px 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+
+input,
+select {
+  border: 1px solid #ddd8eb;
+  border-radius: 10px;
+  padding: 12px;
+  background: white;
+  font-size: 15px;
+}
+
+input {
+  flex: 1;
+  min-width: 220px;
+}
+
+select {
+  min-width: 180px;
+}
+
+.info {
+  background: white;
+  border-radius: 15px;
+  padding: 18px;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 15px rgba(40,30,80,0.08);
+}
+
+.info h2 {
+  margin: 8px 0;
+  font-size: 20px;
+}
+
+.meta {
+  font-size: 13px;
+  color: #777;
+}
+
+.tag {
+  display: inline-block;
+  background: #eeeafb;
+  color: #51429a;
+  padding: 4px 9px;
+  border-radius: 20px;
+  margin-right: 6px;
+}
+
+.info p {
+  line-height: 1.7;
+  color: #555;
+}
+
+.info a {
+  color: #51429a;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.stat {
+  background: white;
+  border-radius: 15px;
+  padding: 18px;
+  box-shadow: 0 3px 15px rgba(40,30,80,0.08);
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: bold;
+  display: block;
+}
+
+.notice {
+  background: #fff9df;
+  border: 1px solid #eadc9b;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 25px;
+  line-height: 1.6;
+}
+
+footer {
+  text-align: center;
+  color: #888;
+  font-size: 12px;
+  padding: 25px;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 25px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>🌙 超かぐや姫！</div>
+    <h1>情報センター</h1>
+    <p class="subtitle">
+      公式情報を中心に、ニュース・書籍・コミックなどを一目で確認
+    </p>
+  </div>
+</header>
+
+<main>
+
+  <div class="stats">
+    <div class="stat">
+      登録情報
+      <span class="stat-number" id="total">0</span>
+    </div>
+
+    <div class="stat">
+      表示中
+      <span class="stat-number" id="shown">0</span>
+    </div>
+
+    <div class="stat">
+      情報源
+      <span class="stat-number" id="sources">0</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input
+      type="search"
+      id="search"
+      placeholder="🔎 情報を検索..."
+    >
+
+    <select id="category">
+      <option value="">すべてのカテゴリ</option>
+      <option value="公式">公式</option>
+      <option value="コミック">コミック</option>
+      <option value="小説">小説</option>
+      <option value="配信">配信</option>
+    </select>
+  </div>
+
+  <section id="information"></section>
+
+  <div class="notice">
+    <strong>🔎 情報について</strong><br>
+    この初期版では、確認できた公開情報を情報源URLとともに表示しています。
+    未確認情報を事実として表示しないことを重視しています。
+  </div>
+
+</main>
+
+<footer>
+  超かぐや姫！情報センター Prototype
+</footer>
+
+<script>
+
+const information = [
+
+  {
+    date: "2026-08-30",
+    category: "公式",
+    title: "超かぐや姫！公式サイト",
+    text: "作品公式サイト。作品情報、キャラクター、スタッフ、映像などを確認できます。",
+    source: "超かぐや姫！公式サイト",
+    url: "https://www.cho-kaguyahime.com/"
+  },
+
+  {
+    date: "2026-08-30",
+    category: "公式",
+    title: "超かぐや姫！公式NEWS",
+    text: "作品に関する公式ニュースや最新のお知らせを確認できます。",
+    source: "超かぐや姫！公式NEWS",
+    url: "https://www.news.cho-kaguyahime.com/"
+  },
+
+  {
+    date: "2026-02-10",
+    category: "コミック",
+    title: "『超かぐや姫！』コミック第1巻",
+    text: "KADOKAWAから発売されたコミック第1巻。作品のコミック展開を確認できます。",
+    source: "KADOKAWA",
+    url: "https://www.kadokawa.co.jp/product/322509000193/"
+  },
+
+  {
+    date: "2026-01-30",
+    category: "小説",
+    title: "『超かぐや姫！』小説版",
+    text: "KADOKAWAから発売された小説版の情報です。",
+    source: "KADOKAWA",
+    url: "https://www.kadokawa.co.jp/product/322509000503/"
+  },
+
+  {
+    date: "2026-01-22",
+    category: "配信",
+    title: "Netflixで世界独占配信",
+    text: "公式サイトで案内されている作品の配信情報です。",
+    source: "超かぐや姫！公式サイト",
+    url: "https://www.cho-kaguyahime.com/"
+  }
+
+];
+
+function render() {
+
+  const keyword =
+    document.getElementById("search").value
+      .toLowerCase()
+      .trim();
+
+  const category =
+    document.getElementById("category").value;
+
+  const results = information.filter(item => {
+
+    const text =
+      item.title +
+      " " +
+      item.text +
+      " " +
+      item.source;
+
+    const matchKeyword =
+      !keyword ||
+      text.toLowerCase().includes(keyword);
+
+    const matchCategory =
+      !category ||
+      item.category === category;
+
+    return matchKeyword && matchCategory;
+
+  });
+
+  const area =
+    document.getElementById("information");
+
+  if (results.length === 0) {
+
+    area.innerHTML =
+      '<div class="info">該当する情報がありません。</div>';
+
+  } else {
+
+    area.innerHTML =
+      results.map(item => `
+
+        <article class="info">
+
+          <div class="meta">
+            ${item.date}
+            <span class="tag">${item.category}</span>
+            ${item.source}
+          </div>
+
+          <h2>${escapeHTML(item.title)}</h2>
+
+          <p>
+            ${escapeHTML(item.text)}
+          </p>
+
+          <a
+            href="${item.url}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            情報源を確認する ↗
+          </a>
+
+        </article>
+
+      `).join("");
+
+  }
+
+  document.getElementById("total").textContent =
+    information.length;
+
+  document.getElementById("shown").textContent =
+    results.length;
+
+  document.getElementById("sources").textContent =
+    new Set(information.map(x => x.source)).size;
+}
+
+function escapeHTML(text) {
+
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+document
+  .getElementById("search")
+  .addEventListener("input", render);
+
+document
+  .getElementById("category")
+  .addEventListener("change", render);
+
+render();
+
+</script>
+
+</body>
+</html>
