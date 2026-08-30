@@ -4,82 +4,98 @@ import urllib.request
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urljoin, urlparse
 
 
 SOURCE_URL = "https://www.news.cho-kaguyahime.com/"
+SOURCE_DOMAIN = "www.news.cho-kaguyahime.com"
 DATA_FILE = Path("data.json")
 
 
-class NewsParser(HTMLParser):
+class ArticleLinkParser(HTMLParser):
+
     def __init__(self):
         super().__init__()
+
         self.items = []
-        self.in_heading = False
+
         self.in_link = False
-        self.current_title = ""
         self.current_url = ""
-        self.current_date = ""
-        self.capture_link = False
+        self.current_text = ""
 
     def handle_starttag(self, tag, attrs):
-        attrs = dict(attrs)
 
-        if tag in ("h2", "h3"):
-            self.in_heading = True
-            self.current_title = ""
+        if tag != "a":
+            return
 
-        if tag == "a" and self.in_heading:
-            self.in_link = True
-            self.current_url = attrs.get("href", "")
+        attributes = dict(attrs)
+        href = attributes.get("href", "")
+
+        if not href:
+            return
+
+        absolute_url = urljoin(
+            SOURCE_URL,
+            href
+        )
+
+        parsed = urlparse(absolute_url)
+
+        if parsed.netloc != SOURCE_DOMAIN:
+            return
+
+        # 公式NEWSの記事URLは /数字/ の形式
+        if not re.fullmatch(
+            r"/\d+/?",
+            parsed.path
+        ):
+            return
+
+        self.in_link = True
+        self.current_url = absolute_url
+        self.current_text = ""
 
     def handle_data(self, data):
-        text = data.strip()
 
-        if self.in_heading and text:
-            self.current_title += text
+        if self.in_link:
+            self.current_text += data
 
     def handle_endtag(self, tag):
 
-        if tag in ("h2", "h3") and self.in_heading:
+        if tag != "a" or not self.in_link:
+            return
 
-            title = re.sub(
-                r"\s+",
-                " ",
-                self.current_title
-            ).strip()
+        title = re.sub(
+            r"\s+",
+            " ",
+            self.current_text
+        ).strip()
 
-            if title and len(title) > 2:
+        if title:
 
-                url = self.current_url
+            self.items.append({
+                "title": title,
+                "url": self.current_url
+            })
 
-                if url.startswith("/"):
-                    url = "https://www.news.cho-kaguyahime.com" + url
-
-                if url:
-                    self.items.append({
-                        "title": title,
-                        "url": url
-                    })
-
-            self.in_heading = False
-            self.in_link = False
-            self.current_title = ""
-            self.current_url = ""
+        self.in_link = False
+        self.current_url = ""
+        self.current_text = ""
 
 
-def fetch_page():
+def fetch_page(url):
 
     request = urllib.request.Request(
-        SOURCE_URL,
+        url,
         headers={
             "User-Agent":
-            "cho-kaguyahime-info/1.0"
+                "cho-kaguyahime-info/1.0"
         }
     )
 
     with urllib.request.urlopen(
         request,
-        timeout=20
+        timeout=30
     ) as response:
 
         return response.read().decode(
@@ -91,6 +107,7 @@ def fetch_page():
 def load_data():
 
     if not DATA_FILE.exists():
+
         return {
             "updated": "",
             "items": []
@@ -99,84 +116,157 @@ def load_data():
     with DATA_FILE.open(
         "r",
         encoding="utf-8"
-    ) as f:
+    ) as file:
 
-        return json.load(f)
+        return json.load(file)
+
+
+def save_data(data):
+
+    temporary_file = DATA_FILE.with_suffix(
+        ".json.tmp"
+    )
+
+    with temporary_file.open(
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            data,
+            file,
+            ensure_ascii=False,
+            indent=2
+        )
+
+    temporary_file.replace(DATA_FILE)
+
+
+def normalize_items(items):
+
+    unique = {}
+    
+    for item in items:
+
+        url = item.get("url", "").strip()
+        title = item.get("title", "").strip()
+
+        if not url or not title:
+            continue
+
+        if url in unique:
+            continue
+
+        unique[url] = {
+            "title": title,
+            "url": url
+        }
+
+    return list(unique.values())
 
 
 def main():
 
-    print("公式NEWSを確認します")
+    print("====================================")
+    print("超かぐや姫！公式NEWS収集")
+    print("====================================")
 
-    html = fetch_page()
+    print(f"取得元: {SOURCE_URL}")
 
-    parser = NewsParser()
+    html = fetch_page(SOURCE_URL)
+
+    print(
+        f"HTML取得成功: {len(html):,} bytes"
+    )
+
+    parser = ArticleLinkParser()
+
     parser.feed(html)
+
+    articles = normalize_items(
+        parser.items
+    )
+
+    print(
+        f"検出した記事: {len(articles)} 件"
+    )
+
+    # 0件なら異常と判断して終了。
+    # 既存のdata.jsonは絶対に変更しない。
+    if len(articles) == 0:
+
+        raise RuntimeError(
+            "公式NEWSの記事を検出できませんでした。"
+            "既存データは変更していません。"
+        )
 
     data = load_data()
 
+    existing_items = data.get(
+        "items",
+        []
+    )
+
     existing_urls = {
         item.get("url")
-        for item in data.get("items", [])
+        for item in existing_items
+        if item.get("url")
     }
+
+    today = datetime.now(
+        timezone.utc
+    ).strftime("%Y-%m-%d")
 
     added = 0
 
-    for article in parser.items:
+    for article in articles:
 
-        if article["url"] in existing_urls:
+        url = article["url"]
+
+        if url in existing_urls:
             continue
 
-        data["items"].append({
-            "date": datetime.now(
-                timezone.utc
-            ).strftime("%Y-%m-%d"),
+        existing_items.append({
+
+            "date": today,
 
             "category": "公式NEWS",
 
             "title": article["title"],
 
             "summary":
-                "公式NEWSで掲載されている記事です。",
+                "超かぐや姫！公式NEWSに掲載された記事です。",
 
             "source":
                 "超かぐや姫！公式NEWS",
 
             "url":
-                article["url"]
+                url
         })
 
-        existing_urls.add(article["url"])
+        existing_urls.add(url)
 
         added += 1
 
+    data["items"] = existing_items
+
     data["updated"] = datetime.now(
         timezone.utc
-    ).strftime("%Y-%m-%dT%H:%M:%SZ")
+    ).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
 
-    with DATA_FILE.open(
-        "w",
-        encoding="utf-8"
-    ) as f:
-
-        json.dump(
-            data,
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
+    save_data(data)
 
     print(
-        f"確認した記事数: {len(parser.items)}"
+        f"新規追加: {added} 件"
     )
 
     print(
-        f"新規追加: {added}"
+        f"登録総数: {len(existing_items)} 件"
     )
 
-    print(
-        f"登録総数: {len(data['items'])}"
-    )
+    print("収集処理成功")
 
 
 if __name__ == "__main__":
