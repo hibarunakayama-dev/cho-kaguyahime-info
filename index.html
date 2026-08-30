@@ -374,8 +374,188 @@ document
   .addEventListener("change", render);
 
 render();
+  let information = [];
 
-</script>
+async function loadInformation() {
+  try {
+    const response = await fetch("data.json", {
+      cache: "no-store"
+    });
 
-</body>
-</html>
+    if (!response.ok) {
+      throw new Error("data.jsonを読み込めませんでした");
+    }
+
+    const data = await response.json();
+
+    information = Array.isArray(data.items)
+      ? data.items
+      : [];
+
+    createCategoryList();
+    render();
+
+  } catch (error) {
+
+    document.getElementById("information").innerHTML = `
+      <div class="info">
+        <h2>⚠️ 情報を読み込めません</h2>
+        <p>
+          データファイルの読み込みに失敗しました。
+          ページを再読み込みしてください。
+        </p>
+      </div>
+    `;
+
+    console.error(error);
+  }
+}
+
+
+function createCategoryList() {
+
+  const select =
+    document.getElementById("category");
+
+  const categories =
+    [...new Set(
+      information.map(item => item.category)
+    )].sort();
+
+  select.innerHTML =
+    '<option value="">すべてのカテゴリ</option>';
+
+  categories.forEach(category => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = category;
+    option.textContent = category;
+
+    select.appendChild(option);
+
+  });
+}
+
+
+function render() {
+
+  const keyword =
+    document.getElementById("search")
+      .value
+      .toLowerCase()
+      .trim();
+
+  const category =
+    document.getElementById("category")
+      .value;
+
+  const results =
+    information.filter(item => {
+
+      const text =
+        `${item.title} ${item.summary} ${item.source}`;
+
+      const keywordMatch =
+        !keyword ||
+        text.toLowerCase().includes(keyword);
+
+      const categoryMatch =
+        !category ||
+        item.category === category;
+
+      return keywordMatch && categoryMatch;
+
+    });
+
+
+  const area =
+    document.getElementById("information");
+
+
+  if (results.length === 0) {
+
+    area.innerHTML = `
+      <div class="info">
+        該当する情報がありません。
+      </div>
+    `;
+
+  } else {
+
+    area.innerHTML =
+      results.map(item => `
+
+        <article class="info">
+
+          <div class="meta">
+            ${escapeHTML(item.date || "")}
+
+            <span class="tag">
+              ${escapeHTML(item.category || "")}
+            </span>
+
+            ${escapeHTML(item.source || "")}
+          </div>
+
+          <h2>
+            ${escapeHTML(item.title || "")}
+          </h2>
+
+          <p>
+            ${escapeHTML(item.summary || "")}
+          </p>
+
+          <a
+            href="${escapeHTML(item.url || "#")}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            情報源を確認する ↗
+          </a>
+
+        </article>
+
+      `).join("");
+
+  }
+
+
+  document.getElementById("total")
+    .textContent = information.length;
+
+  document.getElementById("shown")
+    .textContent = results.length;
+
+  document.getElementById("sources")
+    .textContent =
+      new Set(
+        information.map(item => item.source)
+      ).size;
+}
+
+
+function escapeHTML(text) {
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+document
+  .getElementById("search")
+  .addEventListener("input", render);
+
+
+document
+  .getElementById("category")
+  .addEventListener("change", render);
+
+
+loadInformation();
