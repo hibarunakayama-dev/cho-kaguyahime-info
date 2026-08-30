@@ -1,0 +1,32 @@
+name: 超かぐや姫！情報チェック
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 5 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリを取得
+        uses: actions/checkout@v4
+
+      - name: 実行確認
+        run: |
+          echo "超かぐや姫！情報チェックを開始しました"
+          date -u
+
+      - name: データファイル確認
+        run: |
+          test -f data.json
+          echo "data.json: OK"
+
+      - name: HTML確認
+        run: |
+          test -f index.html
+          echo "index.html: OK"
