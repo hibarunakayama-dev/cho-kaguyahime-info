@@ -58,28 +58,19 @@ def normalize_date(text):
 
 
 def extract_articles(html):
-    soup = BeautifulSoup(
-        html,
-        "html.parser",
-    )
+    soup = BeautifulSoup(html, "html.parser")
 
     articles = []
     seen = set()
 
     for heading in soup.find_all(["h2", "h3"]):
-        link = heading.find(
-            "a",
-            href=True,
-        )
+        link = heading.find("a", href=True)
 
         if not link:
             continue
 
         title = " ".join(
-            link.get_text(
-                " ",
-                strip=True,
-            ).split()
+            link.get_text(" ", strip=True).split()
         )
 
         if not title or len(title) < 2:
@@ -96,6 +87,7 @@ def extract_articles(html):
         if url in seen:
             continue
 
+        # 見出し周辺から公開日を探す
         date = None
         node = heading
 
@@ -231,14 +223,13 @@ def main():
             )
             break
 
-        articles = extract_articles(
-            page_html
-        )
+        articles = extract_articles(page_html)
 
         print(
             f"記事データ: {len(articles)} 件"
         )
 
+        # 記事がないページに到達したら終了
         if not articles:
             print(
                 "記事がないため、ページ取得を終了します。"
@@ -248,18 +239,11 @@ def main():
         new_count = 0
 
         for article in articles:
-
             if article["url"] in seen_urls:
                 continue
 
-            seen_urls.add(
-                article["url"]
-            )
-
-            all_articles.append(
-                article
-            )
-
+            seen_urls.add(article["url"])
+            all_articles.append(article)
             new_count += 1
 
         print(
@@ -282,6 +266,7 @@ def main():
         )
 
     data = load_data()
+
     existing_items = data["items"]
 
     existing_urls = {
@@ -298,10 +283,7 @@ def main():
             continue
 
         added.append(article)
-
-        existing_urls.add(
-            article["url"]
-        )
+        existing_urls.add(article["url"])
 
     print(
         f"既存データ: {len(existing_items)} 件"
@@ -315,60 +297,41 @@ def main():
         f"新しく追加する記事: {len(added)} 件"
     )
 
-    # 新しい記事がある場合だけdata.jsonを変更
     if added:
-
+        # 新しい記事を先頭に追加
         data["items"] = (
             added + existing_items
         )
-
-        data["updated"] = datetime.now(
-            timezone.utc
-        ).strftime("%Y-%m-%d")
-
-        # 保存前にJSONとして確認
-        json.dumps(
-            data,
-            ensure_ascii=False,
-        )
-
-        save_data(data)
-
-        print("")
-        print("=" * 40)
-        print("更新完了")
-        print("=" * 40)
-
-        print(
-            f"追加記事数: {len(added)}"
-        )
-
-        print(
-            f"最終データ件数: {len(data['items'])}"
-        )
-
-        print(
-            "新しいNEWSをdata.jsonに保存しました。"
-        )
-
     else:
+        data["items"] = existing_items
 
-        print("")
-        print("=" * 40)
-        print("更新不要")
-        print("=" * 40)
+    # 更新日時
+    data["updated"] = datetime.now(
+        timezone.utc
+    ).strftime("%Y-%m-%d")
 
-        print(
-            "新しいNEWSはありません。"
-        )
+    # JSONとして保存できることを確認
+    json.dumps(
+        data,
+        ensure_ascii=False,
+    )
 
-        print(
-            "data.jsonは変更していません。"
-        )
+    save_data(data)
 
-        print(
-            f"最終データ件数: {len(existing_items)}"
-        )
+    print("")
+    print("=" * 40)
+    print("更新完了")
+    print("=" * 40)
+
+    print(
+        f"追加記事数: {len(added)}"
+    )
+
+    print(
+        f"最終データ件数: {len(data['items'])}"
+    )
+
+    print("data.jsonを正常に更新しました。")
 
 
 if __name__ == "__main__":
