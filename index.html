@@ -3,275 +3,647 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>超かぐや姫！情報センター</title>
+
+<title>ツクヨミ情報センター</title>
 
 <style>
 * {
   box-sizing: border-box;
 }
 
+:root {
+  --night: #0b1433;
+  --deep: #111d45;
+  --moon: #f7e8b0;
+  --gold: #c9a85b;
+  --paper: #f7f1df;
+  --paper2: #eee5ca;
+  --ink: #1c2b4d;
+  --purple: #40366f;
+  --mist: #cfd5e6;
+  --white: #fffdf7;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
+  color: var(--ink);
   font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Noto Sans JP",
-    "Yu Gothic",
-    sans-serif;
-  background: #f7f6fc;
-  color: #202038;
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    "Hiragino Mincho Pro",
+    "Noto Serif JP",
+    serif;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,240,180,.18), transparent 30%),
+    linear-gradient(180deg, #09132f 0%, #111b3e 38%, #e9e4d6 38%, #f3eee1 100%);
 }
 
-header {
-  background: linear-gradient(135deg, #49318f, #7660d2);
-  color: white;
-  padding: 48px 24px 52px;
+/* =========================
+   上部・月夜の世界
+========================= */
+
+.hero {
+  min-height: 390px;
+  position: relative;
+  overflow: hidden;
+  color: #fff8dc;
+  background:
+    radial-gradient(circle at 78% 25%, rgba(255,238,173,.9) 0 5%, rgba(255,238,173,.16) 6%, transparent 18%),
+    radial-gradient(circle at 20% 15%, rgba(122,107,180,.35), transparent 28%),
+    linear-gradient(180deg, #08122e 0%, #172451 60%, #24345d 100%);
+  border-bottom: 1px solid rgba(201,168,91,.7);
 }
 
-.header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
+/* 月 */
+
+.moon {
+  position: absolute;
+  width: 155px;
+  height: 155px;
+  right: 11%;
+  top: 55px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 35%, #fffdf0, #f6e7ae 58%, #d5bd73);
+  box-shadow:
+    0 0 35px rgba(255,239,170,.65),
+    0 0 100px rgba(255,239,170,.25);
 }
 
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
+/* 三日月 */
+
+.crescent {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  left: 7%;
+  top: 75px;
+  border-radius: 50%;
+  border: 3px solid rgba(247,232,176,.9);
+  box-shadow: 0 0 25px rgba(247,232,176,.3);
 }
 
-h1 {
-  margin: 0;
-  font-size: clamp(38px, 7vw, 64px);
-  letter-spacing: 2px;
+.crescent::after {
+  content: "";
+  position: absolute;
+  width: 82px;
+  height: 82px;
+  left: 22px;
+  top: -8px;
+  border-radius: 50%;
+  background: #0a1431;
 }
 
-.subtitle {
-  margin: 22px 0 0;
-  font-size: clamp(18px, 3vw, 28px);
-  opacity: 0.9;
+/* 星 */
+
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 13% 29%, #fff7d0 0 1px, transparent 2px),
+    radial-gradient(circle at 28% 18%, #fff7d0 0 1px, transparent 2px),
+    radial-gradient(circle at 42% 12%, #fff7d0 0 1px, transparent 2px),
+    radial-gradient(circle at 57% 25%, #fff7d0 0 1px, transparent 2px),
+    radial-gradient(circle at 67% 13%, #fff7d0 0 1px, transparent 2px),
+    radial-gradient(circle at 89% 20%, #fff7d0 0 1px, transparent 2px),
+    radial-gradient(circle at 76% 35%, #fff7d0 0 1px, transparent 2px),
+    radial-gradient(circle at 34% 38%, #fff7d0 0 1px, transparent 2px);
 }
 
-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 42px 24px 70px;
+/* 水面 */
+
+.water {
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  bottom: -20px;
+  height: 125px;
+  opacity: .75;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 15px,
+      rgba(201,168,91,.28) 16px 17px,
+      transparent 18px 29px
+    );
+  transform: perspective(500px) rotateX(55deg);
 }
 
-/* 集計 */
-.stats {
+/* 雲 */
+
+.cloud {
+  position: absolute;
+  width: 280px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(219,221,232,.11);
+  filter: blur(1px);
+}
+
+.cloud.one {
+  left: -30px;
+  bottom: 115px;
+}
+
+.cloud.two {
+  right: -60px;
+  bottom: 85px;
+  width: 340px;
+}
+
+/* ヘッダー文字 */
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1250px;
+  margin: auto;
+  padding: 48px 28px 135px;
+  text-align: center;
+}
+
+.kana {
+  letter-spacing: .45em;
+  font-size: 14px;
+  color: #e8d69b;
+}
+
+.hero h1 {
+  margin: 12px 0 8px;
+  font-size: clamp(42px, 6vw, 76px);
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-shadow: 0 3px 18px rgba(0,0,0,.45);
+}
+
+.hero-subtitle {
+  font-size: clamp(15px, 2vw, 20px);
+  letter-spacing: .2em;
+  color: #eee7d2;
+}
+
+/* =========================
+   全体
+========================= */
+
+.page {
+  width: min(1450px, 94%);
+  margin: -55px auto 60px;
+  position: relative;
+  z-index: 5;
+}
+
+.layout {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  margin-bottom: 32px;
-}
-
-.stat {
-  background: white;
-  border-radius: 24px;
-  padding: 30px;
-  box-shadow: 0 8px 25px rgba(60, 40, 100, 0.08);
-}
-
-.stat-label {
-  font-size: 20px;
-  margin-bottom: 12px;
-}
-
-.stat-number {
-  font-size: 44px;
-  font-weight: bold;
-}
-
-/* 検索 */
-.controls {
-  display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 230px minmax(0, 1fr) 300px;
   gap: 18px;
-  margin-bottom: 35px;
+}
+
+/* =========================
+   和紙パネル
+========================= */
+
+.panel {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.8), rgba(239,231,207,.95)),
+    var(--paper);
+  border: 1px solid rgba(153,127,67,.35);
+  box-shadow:
+    0 12px 35px rgba(20,28,55,.16),
+    inset 0 0 0 1px rgba(255,255,255,.7);
+}
+
+.paper {
+  border-radius: 5px;
+}
+
+.panel-title {
+  margin: 0;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(153,127,67,.25);
+  font-size: 19px;
+  color: #25345a;
+  letter-spacing: .08em;
+}
+
+/* =========================
+   左メニュー
+========================= */
+
+.sidebar {
+  background:
+    linear-gradient(180deg, #0d1737, #17234b 75%, #111b3c);
+  color: #eee6c9;
+  border: 1px solid rgba(201,168,91,.5);
+  box-shadow: 0 12px 35px rgba(5,10,25,.3);
+}
+
+.sidebar h2 {
+  margin: 0;
+  padding: 24px 20px 16px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #f5e5ac;
+}
+
+.nav-list {
+  padding: 0 10px 20px;
+}
+
+.nav-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #eee8d7;
+  text-align: left;
+  padding: 12px 12px;
+  margin: 2px 0;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.nav-button:hover,
+.nav-button.active {
+  background: rgba(201,168,91,.17);
+  color: #fff3c4;
+}
+
+.nav-count {
+  float: right;
+  color: #d6bf7e;
+}
+
+.side-note {
+  margin: 15px;
+  padding: 16px;
+  border-top: 1px solid rgba(201,168,91,.35);
+  color: #cbd1df;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+/* =========================
+   中央
+========================= */
+
+.main {
+  min-width: 0;
+}
+
+.welcome {
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+  color: #fff4cf;
+  background:
+    radial-gradient(circle at 80% 40%, rgba(247,232,176,.45), transparent 18%),
+    linear-gradient(120deg, #111b40, #30275e 60%, #18264e);
+  border: 1px solid rgba(201,168,91,.5);
+  padding: 35px;
+}
+
+.welcome::after {
+  content: "月";
+  position: absolute;
+  right: 8%;
+  top: 20px;
+  font-size: 130px;
+  color: rgba(247,232,176,.09);
+}
+
+.welcome h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 8px;
+  font-size: 34px;
+  font-weight: 500;
+}
+
+.welcome p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #d8d9e4;
+  line-height: 1.9;
+}
+
+/* =========================
+   検索
+========================= */
+
+.search-panel {
+  margin-top: 18px;
+  padding: 15px;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  gap: 10px;
 }
 
 input,
 select {
   width: 100%;
-  padding: 18px 20px;
-  border: 2px solid #e2dff0;
-  border-radius: 16px;
-  background: white;
-  font-size: 18px;
-  color: #202038;
+  border: 1px solid #cfc5a9;
+  background: rgba(255,255,255,.75);
+  color: var(--ink);
+  padding: 13px 15px;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
 }
 
 input:focus,
 select:focus {
-  outline: none;
-  border-color: #7660d2;
+  border-color: #9d7e35;
+  box-shadow: 0 0 0 2px rgba(157,126,53,.12);
 }
 
-/* 説明 */
-.info {
-  background: #fff9dc;
-  border: 1px solid #ead98b;
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 38px;
+/* =========================
+   統計
+========================= */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
 }
 
-.info-title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 10px;
+.stat {
+  padding: 17px;
+  text-align: center;
 }
 
-/* NEWS */
-.section-title {
-  font-size: 32px;
-  margin: 0 0 20px;
+.stat-label {
+  font-size: 12px;
+  color: #59627b;
+}
+
+.stat-number {
+  display: block;
+  margin-top: 6px;
+  font-size: 30px;
+  color: #1a2a50;
+}
+
+/* =========================
+   情報一覧
+========================= */
+
+.news-panel {
+  margin-top: 18px;
 }
 
 .news-list {
+  padding: 5px 20px 20px;
+}
+
+.news-item {
   display: grid;
-  gap: 20px;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 13px;
+  padding: 18px 4px;
+  border-bottom: 1px solid rgba(85,85,85,.15);
 }
 
-.news-card {
-  background: white;
-  border-radius: 22px;
-  padding: 26px;
-  box-shadow: 0 7px 22px rgba(60, 40, 100, 0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+.news-mark {
+  width: 8px;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: #b08b38;
+  box-shadow: 0 0 0 3px rgba(176,139,56,.12);
 }
 
-.news-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(60, 40, 100, 0.13);
-}
-
-.news-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-
-.date {
-  font-weight: bold;
-  color: #49318f;
-  font-size: 17px;
-}
-
-.category {
-  display: inline-block;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: #eeeafb;
-  color: #49318f;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.new {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: #fff0a8;
-  color: #6d5600;
-  font-size: 13px;
-  font-weight: bold;
+.news-date {
+  font-size: 12px;
+  color: #776e5e;
 }
 
 .news-title {
-  margin: 0 0 12px;
-  font-size: 23px;
-  line-height: 1.55;
-}
-
-.news-summary {
-  margin: 0 0 18px;
-  color: #65657a;
-  line-height: 1.7;
-}
-
-.source {
-  color: #77778c;
-  font-size: 14px;
-  margin-bottom: 17px;
-}
-
-.news-link {
-  display: inline-block;
+  display: block;
+  margin: 4px 0;
+  color: #172b54;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.6;
   text-decoration: none;
-  background: #49318f;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: bold;
 }
 
-.news-link:hover {
-  background: #392474;
+.news-title:hover {
+  color: #775c20;
+  text-decoration: underline;
+}
+
+.news-source {
+  font-size: 12px;
+  color: #766e62;
+}
+
+.news-url {
+  display: inline-block;
+  margin-top: 7px;
+  font-size: 12px;
+  color: #796126;
+  text-decoration: none;
+}
+
+.news-url:hover {
+  text-decoration: underline;
 }
 
 .empty {
-  background: white;
-  border-radius: 20px;
-  padding: 40px;
+  padding: 45px 20px;
   text-align: center;
-  color: #77778c;
+  color: #686b73;
 }
 
-.loading {
-  text-align: center;
-  padding: 40px;
+/* =========================
+   右側
+========================= */
+
+.right-panel {
+  padding-bottom: 15px;
 }
 
-.error {
-  background: #fff0f0;
-  border: 1px solid #e0aaaa;
-  border-radius: 18px;
-  padding: 25px;
-  color: #8a2525;
+.right-section {
+  padding: 15px 18px;
+  border-bottom: 1px solid rgba(153,127,67,.2);
 }
+
+.right-section h3 {
+  margin: 0 0 13px;
+  font-size: 15px;
+  color: #26375c;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #668b62;
+}
+
+.big-number {
+  font-size: 29px;
+  color: #1b2d55;
+}
+
+.source-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.source-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dotted #cfc4a5;
+  font-size: 13px;
+}
+
+.source-list span:last-child {
+  color: #78602a;
+}
+
+/* =========================
+   フッター
+========================= */
 
 footer {
+  margin-top: 30px;
+  padding: 35px 15px;
   text-align: center;
-  color: #9999aa;
-  padding: 25px;
+  color: #ddd6c4;
+  background: #0c1533;
+  border-top: 1px solid rgba(201,168,91,.45);
+  letter-spacing: .12em;
+  font-size: 12px;
 }
 
-/* スマートフォン */
-@media (max-width: 700px) {
-  header {
-    padding: 35px 20px 40px;
+footer .moon-symbol {
+  display: block;
+  color: #e8d393;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* =========================
+   スマホ
+========================= */
+
+@media (max-width: 1050px) {
+  .layout {
+    grid-template-columns: 190px minmax(0, 1fr);
   }
 
-  main {
-    padding: 28px 16px 50px;
+  .right {
+    grid-column: 1 / -1;
+  }
+
+  .right-panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    background:
+      linear-gradient(180deg, #09132f 0%, #18234a 270px, #eee9dc 270px);
+  }
+
+  .hero {
+    min-height: 300px;
+  }
+
+  .hero-content {
+    padding: 38px 18px 100px;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+  }
+
+  .moon {
+    width: 100px;
+    height: 100px;
+    right: 8%;
+    top: 60px;
+  }
+
+  .crescent {
+    width: 65px;
+    height: 65px;
+    left: 5%;
+    top: 75px;
+  }
+
+  .crescent::after {
+    width: 59px;
+    height: 59px;
+    left: 17px;
+    top: -6px;
+  }
+
+  .page {
+    width: 96%;
+    margin-top: -35px;
+  }
+
+  .layout {
+    display: block;
+  }
+
+  .sidebar {
+    margin-bottom: 15px;
+  }
+
+  .nav-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .search-row {
+    grid-template-columns: 1fr;
   }
 
   .stats {
     grid-template-columns: 1fr;
-    gap: 14px;
   }
 
-  .stat {
-    padding: 22px;
+  .right {
+    margin-top: 18px;
   }
 
-  .stat-number {
-    font-size: 36px;
+  .right-panel {
+    display: block;
   }
 
-  .controls {
-    grid-template-columns: 1fr;
+  .welcome {
+    padding: 25px 20px;
   }
 
-  .news-card {
-    padding: 21px;
-  }
-
-  .news-title {
-    font-size: 20px;
+  .welcome h2 {
+    font-size: 26px;
   }
 }
 </style>
@@ -279,305 +651,865 @@ footer {
 
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="logo">🌙 超かぐや姫！</div>
-    <h1>情報センター</h1>
-    <p class="subtitle">
-      公式情報を中心に、ニュース・書籍・コミックなどを一目で確認
-    </p>
+<header class="hero">
+
+  <div class="stars"></div>
+  <div class="crescent"></div>
+  <div class="moon"></div>
+
+  <div class="cloud one"></div>
+  <div class="cloud two"></div>
+  <div class="water"></div>
+
+  <div class="hero-content">
+    <div class="kana">つ く よ み　の　も　と　へ</div>
+
+    <h1>ツクヨミ情報センター</h1>
+
+    <div class="hero-subtitle">
+      月の光に導かれ、超かぐや姫の情報をひとつに
+    </div>
   </div>
+
 </header>
 
-<main>
+<main class="page">
 
-  <section class="stats">
-    <div class="stat">
-      <div class="stat-label">登録情報</div>
-      <div class="stat-number" id="totalCount">0</div>
-    </div>
+  <div class="layout">
 
-    <div class="stat">
-      <div class="stat-label">表示中</div>
-      <div class="stat-number" id="displayCount">0</div>
-    </div>
+    <!-- 左側 -->
+    <aside class="sidebar paper">
 
-    <div class="stat">
-      <div class="stat-label">情報源</div>
-      <div class="stat-number" id="sourceCount">0</div>
-    </div>
-  </section>
+      <h2>☾　案内</h2>
 
-  <section class="controls">
-    <input
-      id="searchInput"
-      type="search"
-      placeholder="🔎 情報を検索..."
-      aria-label="情報を検索"
-    >
+      <div class="nav-list">
 
-    <select id="categorySelect" aria-label="カテゴリー">
-      <option value="">すべてのカテゴリ</option>
-    </select>
-  </section>
+        <button class="nav-button active" data-filter="all">
+          月の間
+          <span class="nav-count" id="navAll">0</span>
+        </button>
 
-  <section class="info">
-    <div class="info-title">🔎 情報について</div>
-    <div>
-      この情報センターでは、確認できた公開情報を
-      情報源URLとともに表示しています。
-      公式NEWSの記事は公式サイトへのリンクから確認できます。
-    </div>
-  </section>
+        <button class="nav-button" data-filter="new">
+          新しき情報
+          <span class="nav-count" id="navNew">0</span>
+        </button>
 
-  <section>
-    <h2 class="section-title">📰 公式NEWS</h2>
+        <button class="nav-button" data-filter="official">
+          公式NEWS
+          <span class="nav-count" id="navOfficial">0</span>
+        </button>
 
-    <div id="loading" class="loading">
-      情報を読み込んでいます……
-    </div>
+        <button class="nav-button" data-filter="concert">
+          音の知らせ
+        </button>
 
-    <div id="error" class="error" style="display:none;"></div>
+        <button class="nav-button" data-filter="release">
+          形あるもの
+        </button>
 
-    <div id="newsList" class="news-list"></div>
-  </section>
+        <button class="nav-button" data-filter="media">
+          世の知らせ
+        </button>
+
+      </div>
+
+      <div class="side-note">
+        月の世界から届いた情報を、
+        静かに、見やすく、
+        ひとつの場所へ集めています。
+      </div>
+
+    </aside>
+
+    <!-- 中央 -->
+    <section class="main">
+
+      <section class="welcome panel">
+
+        <h2>月の間</h2>
+
+        <p>
+          ここは、超かぐや姫にまつわる情報を
+          ゆっくりと眺めるための場所です。
+          <br>
+          最新のお知らせから過去の記録まで、
+          月の光のようにひとつにつないでいます。
+        </p>
+
+      </section>
+
+      <!-- 検索 -->
+      <section class="search-panel panel">
+
+        <div class="search-row">
+
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="⌕　情報を探す……"
+            autocomplete="off"
+          >
+
+          <select id="sortSelect">
+            <option value="new">新しい順</option>
+            <option value="old">古い順</option>
+            <option value="title">題名順</option>
+          </select>
+
+        </div>
+
+      </section>
+
+      <!-- 統計 -->
+      <section class="stats">
+
+        <div class="stat panel">
+          <span class="stat-label">登録情報</span>
+          <span class="stat-number" id="totalCount">0</span>
+        </div>
+
+        <div class="stat panel">
+          <span class="stat-label">表示中</span>
+          <span class="stat-number" id="visibleCount">0</span>
+        </div>
+
+        <div class="stat panel">
+          <span class="stat-label">情報源</span>
+          <span class="stat-number" id="sourceCount">0</span>
+        </div>
+
+      </section>
+
+      <!-- 情報一覧 -->
+      <section class="news-panel panel">
+
+        <h2 class="panel-title">
+          ✦　最新の情報
+        </h2>
+
+        <div id="newsList" class="news-list">
+
+          <div class="empty">
+            情報を読み込んでいます……
+          </div>
+
+        </div>
+
+      </section>
+
+    </section>
+
+    <!-- 右側 -->
+    <aside class="right">
+
+      <div class="right-panel panel">
+
+        <section class="right-section">
+
+          <h3>月の記録</h3>
+
+          <div>
+            <div class="big-number" id="rightTotal">0</div>
+            <small>登録されている情報</small>
+          </div>
+
+        </section>
+
+        <section class="right-section">
+
+          <h3>情報源</h3>
+
+          <ul id="sourceList" class="source-list">
+            <li>
+              <span>読み込み中</span>
+              <span>—</span>
+            </li>
+          </ul>
+
+        </section>
+
+        <section class="right-section">
+
+          <h3>更新の様子</h3>
+
+          <div class="status">
+            <span class="status-dot"></span>
+            <span>情報センター稼働中</span>
+          </div>
+
+          <p style="font-size:12px;line-height:1.8;color:#656a78;">
+            公式NEWSの自動収集結果が
+            data.jsonへ反映されると、
+            この場所にも情報が届きます。
+          </p>
+
+        </section>
+
+        <section class="right-section">
+
+          <h3>記録を探す</h3>
+
+          <p style="font-size:12px;line-height:1.8;">
+            題名、日付、情報源などを
+            検索欄から探すことができます。
+          </p>
+
+        </section>
+
+      </div>
+
+    </aside>
+
+  </div>
 
 </main>
 
 <footer>
-  超かぐや姫！情報センター
+
+  <span class="moon-symbol">☾</span>
+
+  ツクヨミ情報センター
+
+  <br><br>
+
+  月の光のように、静かに、正確に。
+
 </footer>
 
+
 <script>
+/*
+ * ==========================================
+ * ツクヨミ情報センター
+ * data.json 読み込み
+ * ==========================================
+ */
+
 let allItems = [];
+let currentFilter = "all";
 
-/* data.jsonを読み込む */
-async function loadData() {
-  const loading = document.getElementById("loading");
-  const error = document.getElementById("error");
+/* ------------------------------
+   日付を安全に取得
+------------------------------ */
 
-  try {
-    const response = await fetch("./data.json", {
-      cache: "no-store"
-    });
-
-    if (!response.ok) {
-      throw new Error("data.jsonを読み込めませんでした");
-    }
-
-    const data = await response.json();
-
-    if (!Array.isArray(data.items)) {
-      throw new Error("data.jsonのitemsが見つかりません");
-    }
-
-    allItems = data.items.slice();
-
-    /* 新しい順 */
-    allItems.sort((a, b) => {
-      const da = new Date(a.date || "1900-01-01");
-      const db = new Date(b.date || "1900-01-01");
-      return db - da;
-    });
-
-    setupCategories();
-    updateStats();
-    render();
-
-    loading.style.display = "none";
-
-  } catch (e) {
-    loading.style.display = "none";
-    error.style.display = "block";
-    error.textContent =
-      "情報の読み込みに失敗しました。ページを再読み込みしてください。";
-    console.error(e);
-  }
-}
-
-/* カテゴリーを作る */
-function setupCategories() {
-  const select = document.getElementById("categorySelect");
-
-  const categories = [
-    ...new Set(
-      allItems
-        .map(item => item.category)
-        .filter(Boolean)
-    )
-  ].sort();
-
-  categories.forEach(category => {
-    const option = document.createElement("option");
-    option.value = category;
-    option.textContent = category;
-    select.appendChild(option);
-  });
-}
-
-/* 統計 */
-function updateStats() {
-  document.getElementById("totalCount").textContent =
-    allItems.length;
-
-  const sources = new Set(
-    allItems
-      .map(item => item.source)
-      .filter(Boolean)
+function getDate(item) {
+  return (
+    item.date ||
+    item.published ||
+    item.published_at ||
+    item.publication_date ||
+    item.created_at ||
+    ""
   );
-
-  document.getElementById("sourceCount").textContent =
-    sources.size;
 }
 
-/* 日付表示 */
-function formatDate(dateString) {
-  if (!dateString) return "";
+/* ------------------------------
+   タイトルを安全に取得
+------------------------------ */
 
-  const date = new Date(dateString + "T00:00:00");
+function getTitle(item) {
+  return (
+    item.title ||
+    item.name ||
+    item.subject ||
+    "無題の情報"
+  );
+}
+
+/* ------------------------------
+   URLを安全に取得
+------------------------------ */
+
+function getUrl(item) {
+  return (
+    item.url ||
+    item.link ||
+    item.href ||
+    ""
+  );
+}
+
+/* ------------------------------
+   情報源
+------------------------------ */
+
+function getSource(item) {
+  return (
+    item.source ||
+    item.source_name ||
+    item.category ||
+    "その他"
+  );
+}
+
+/* ------------------------------
+   カテゴリー判定
+------------------------------ */
+
+function categoryOf(item) {
+
+  const text = (
+    getTitle(item) +
+    " " +
+    JSON.stringify(item)
+  ).toLowerCase();
+
+  if (
+    text.includes("ライブ") ||
+    text.includes("公演") ||
+    text.includes("コンサート") ||
+    text.includes("オーケストラ")
+  ) {
+    return "concert";
+  }
+
+  if (
+    text.includes("発売") ||
+    text.includes("商品") ||
+    text.includes("blu-ray") ||
+    text.includes("cd") ||
+    text.includes("リリース")
+  ) {
+    return "release";
+  }
+
+  if (
+    text.includes("テレビ") ||
+    text.includes("出演") ||
+    text.includes("nhk") ||
+    text.includes("ラジオ")
+  ) {
+    return "media";
+  }
+
+  return "other";
+}
+
+/* ------------------------------
+   日付を比較
+------------------------------ */
+
+function timestamp(item) {
+
+  const value = getDate(item);
+
+  if (!value) {
+    return 0;
+  }
+
+  const t = Date.parse(value);
+
+  return Number.isNaN(t) ? 0 : t;
+}
+
+/* ------------------------------
+   日付表示
+------------------------------ */
+
+function displayDate(value) {
+
+  if (!value) {
+    return "日付不明";
+  }
+
+  const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return dateString;
+    return value;
   }
 
-  return date.toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
+  return date.toLocaleDateString(
+    "ja-JP",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    }
+  );
 }
 
-/* HTMLエスケープ */
-function escapeHTML(value) {
-  const div = document.createElement("div");
-  div.textContent = value ?? "";
-  return div.innerHTML;
+/* ------------------------------
+   HTMLエスケープ
+------------------------------ */
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-/* 表示 */
-function render() {
-  const search =
-    document.getElementById("searchInput").value
-      .trim()
-      .toLowerCase();
+/* ------------------------------
+   データ読み込み
+------------------------------ */
 
-  const category =
-    document.getElementById("categorySelect").value;
-
-  const filtered = allItems.filter(item => {
-
-    const text = [
-      item.title,
-      item.summary,
-      item.source,
-      item.category
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-
-    const matchesSearch =
-      !search || text.includes(search);
-
-    const matchesCategory =
-      !category || item.category === category;
-
-    return matchesSearch && matchesCategory;
-  });
-
-  document.getElementById("displayCount").textContent =
-    filtered.length;
+async function loadData() {
 
   const list = document.getElementById("newsList");
 
-  if (filtered.length === 0) {
+  try {
+
+    const response = await fetch(
+      "data.json?ts=" + Date.now(),
+      {
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "data.json の読み込みに失敗しました: " +
+        response.status
+      );
+    }
+
+    const raw = await response.json();
+
+    /*
+     * data.json が
+     * 配列の場合
+     */
+    if (Array.isArray(raw)) {
+
+      allItems = raw;
+
+    /*
+     * data.json が
+     * articles / items / data
+     * のいずれかを持つ場合
+     */
+    } else if (Array.isArray(raw.articles)) {
+
+      allItems = raw.articles;
+
+    } else if (Array.isArray(raw.items)) {
+
+      allItems = raw.items;
+
+    } else if (Array.isArray(raw.data)) {
+
+      allItems = raw.data;
+
+    } else {
+
+      throw new Error(
+        "data.json 内に記事データが見つかりません。"
+      );
+    }
+
+    /*
+     * 空データでも安全に動作
+     */
+    allItems = allItems.filter(
+      item => item && typeof item === "object"
+    );
+
+    updateStatistics();
+
+    renderSources();
+
+    render();
+
+  } catch (error) {
+
+    console.error(error);
+
     list.innerHTML = `
       <div class="empty">
-        該当する情報はありませんでした。
+        <strong>情報を読み込めませんでした。</strong>
+        <br><br>
+        data.json を確認してください。
       </div>
     `;
+  }
+}
+
+/* ------------------------------
+   統計
+------------------------------ */
+
+function updateStatistics() {
+
+  document.getElementById("totalCount")
+    .textContent = allItems.length;
+
+  document.getElementById("rightTotal")
+    .textContent = allItems.length;
+
+  const sources = new Set(
+    allItems.map(getSource)
+  );
+
+  document.getElementById("sourceCount")
+    .textContent = sources.size;
+
+  document.getElementById("navAll")
+    .textContent = allItems.length;
+
+  document.getElementById("navOfficial")
+    .textContent =
+      allItems.filter(
+        item =>
+          String(getSource(item))
+            .includes("公式")
+      ).length;
+
+  const recent = allItems.filter(
+    item => {
+
+      const t = timestamp(item);
+
+      if (!t) return false;
+
+      const thirtyDays =
+        1000 * 60 * 60 * 24 * 30;
+
+      return Date.now() - t <= thirtyDays;
+    }
+  );
+
+  document.getElementById("navNew")
+    .textContent = recent.length;
+}
+
+/* ------------------------------
+   情報源一覧
+------------------------------ */
+
+function renderSources() {
+
+  const box =
+    document.getElementById("sourceList");
+
+  const map = new Map();
+
+  allItems.forEach(item => {
+
+    const source = getSource(item);
+
+    map.set(
+      source,
+      (map.get(source) || 0) + 1
+    );
+
+  });
+
+  const sources =
+    [...map.entries()]
+      .sort((a, b) => b[1] - a[1]);
+
+  if (!sources.length) {
+
+    box.innerHTML = `
+      <li>
+        <span>情報源なし</span>
+        <span>0</span>
+      </li>
+    `;
+
     return;
   }
 
-  list.innerHTML = filtered.map((item, index) => {
+  box.innerHTML =
+    sources
+      .slice(0, 8)
+      .map(
+        ([source, count]) => `
+          <li>
+            <span>
+              ${escapeHtml(source)}
+            </span>
+            <span>
+              ${count}
+            </span>
+          </li>
+        `
+      )
+      .join("");
+}
 
-    const isNew = index < 3;
+/* ------------------------------
+   フィルター
+------------------------------ */
 
-    return `
-      <article class="news-card">
+function filterItems(items) {
 
-        <div class="news-top">
+  if (currentFilter === "all") {
+    return items;
+  }
 
-          <span class="date">
-            ${escapeHTML(formatDate(item.date))}
-          </span>
+  if (currentFilter === "official") {
 
-          ${
-            item.category
-              ? `<span class="category">
-                  ${escapeHTML(item.category)}
-                 </span>`
-              : ""
-          }
+    return items.filter(
+      item =>
+        String(getSource(item))
+          .includes("公式")
+        ||
+        getUrl(item)
+          .includes("news.cho-kaguyahime.com")
+    );
+  }
 
-          ${
-            isNew
-              ? `<span class="new">新着</span>`
-              : ""
-          }
+  if (currentFilter === "new") {
 
+    const thirtyDays =
+      1000 * 60 * 60 * 24 * 30;
+
+    return items.filter(
+      item => {
+
+        const t = timestamp(item);
+
+        return (
+          t &&
+          Date.now() - t <= thirtyDays
+        );
+
+      }
+    );
+  }
+
+  return items.filter(
+    item => categoryOf(item) === currentFilter
+  );
+}
+
+/* ------------------------------
+   表示
+------------------------------ */
+
+function render() {
+
+  const keyword =
+    document.getElementById(
+      "searchInput"
+    ).value
+      .trim()
+      .toLowerCase();
+
+  const sort =
+    document.getElementById(
+      "sortSelect"
+    ).value;
+
+  let items =
+    filterItems(allItems);
+
+  /*
+   * 検索
+   */
+  if (keyword) {
+
+    items = items.filter(item => {
+
+      const text = [
+        getTitle(item),
+        getDate(item),
+        getSource(item),
+        getUrl(item),
+        JSON.stringify(item)
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return text.includes(keyword);
+    });
+  }
+
+  /*
+   * 並び替え
+   */
+
+  if (sort === "new") {
+
+    items.sort(
+      (a, b) =>
+        timestamp(b) - timestamp(a)
+    );
+
+  } else if (sort === "old") {
+
+    items.sort(
+      (a, b) =>
+        timestamp(a) - timestamp(b)
+    );
+
+  } else if (sort === "title") {
+
+    items.sort(
+      (a, b) =>
+        getTitle(a)
+          .localeCompare(
+            getTitle(b),
+            "ja"
+          )
+    );
+  }
+
+  document.getElementById(
+    "visibleCount"
+  ).textContent = items.length;
+
+  const list =
+    document.getElementById(
+      "newsList"
+    );
+
+  if (!items.length) {
+
+    list.innerHTML = `
+      <div class="empty">
+        月の記録は見つかりませんでした。
+      </div>
+    `;
+
+    return;
+  }
+
+  list.innerHTML =
+    items
+      .map(renderItem)
+      .join("");
+}
+
+/* ------------------------------
+   記事1件
+------------------------------ */
+
+function renderItem(item) {
+
+  const title =
+    escapeHtml(getTitle(item));
+
+  const date =
+    escapeHtml(
+      displayDate(getDate(item))
+    );
+
+  const source =
+    escapeHtml(getSource(item));
+
+  const url =
+    getUrl(item);
+
+  const safeUrl =
+    escapeHtml(url);
+
+  return `
+    <article class="news-item">
+
+      <div class="news-mark"></div>
+
+      <div>
+
+        <div class="news-date">
+          ${date}
         </div>
 
-        <h3 class="news-title">
-          ${escapeHTML(item.title)}
-        </h3>
-
         ${
-          item.summary
-            ? `<p class="news-summary">
-                ${escapeHTML(item.summary)}
-               </p>`
-            : ""
-        }
-
-        ${
-          item.source
-            ? `<div class="source">
-                情報源：${escapeHTML(item.source)}
-               </div>`
-            : ""
-        }
-
-        ${
-          item.url
-            ? `<a
-                class="news-link"
-                href="${escapeHTML(item.url)}"
+          url
+            ? `
+              <a
+                class="news-title"
+                href="${safeUrl}"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                公式NEWSを見る →
-              </a>`
+                ${title}
+              </a>
+            `
+            : `
+              <div class="news-title">
+                ${title}
+              </div>
+            `
+        }
+
+        <div class="news-source">
+          情報源：${source}
+        </div>
+
+        ${
+          url
+            ? `
+              <a
+                class="news-url"
+                href="${safeUrl}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                月の記録を開く　›
+              </a>
+            `
             : ""
         }
 
-      </article>
-    `;
-  }).join("");
+      </div>
+
+    </article>
+  `;
 }
 
-/* 検索 */
+/* ------------------------------
+   ナビゲーション
+------------------------------ */
+
+document
+  .querySelectorAll(".nav-button")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelectorAll(".nav-button")
+          .forEach(
+            b => b.classList.remove("active")
+          );
+
+        button.classList.add("active");
+
+        currentFilter =
+          button.dataset.filter;
+
+        render();
+      }
+    );
+
+  });
+
+/* ------------------------------
+   検索
+------------------------------ */
+
 document
   .getElementById("searchInput")
-  .addEventListener("input", render);
+  .addEventListener(
+    "input",
+    render
+  );
 
-/* カテゴリー */
+/* ------------------------------
+   並び替え
+------------------------------ */
+
 document
-  .getElementById("categorySelect")
-  .addEventListener("change", render);
+  .getElementById("sortSelect")
+  .addEventListener(
+    "change",
+    render
+  );
 
-/* 開始 */
+/* ------------------------------
+   起動
+------------------------------ */
+
 loadData();
+
 </script>
 
 </body>
